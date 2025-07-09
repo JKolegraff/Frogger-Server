@@ -37,6 +37,19 @@ wss.on('connection', (socket) => {
         });
       }
 
+      if (msg.type === "ready") {
+        const player = players.find(p => p.id === socket.id);
+        if (player) player.isReady = true;
+    
+        // Broadcast updated ready states
+        broadcast({ type: "player_ready", players });
+    
+        // Check if both players are ready
+        if (players.length === 2 && players.every(p => p.isReady)) {
+          broadcast({ type: "start_game" });
+        }
+      }
+      
       // Future: handle game actions, etc.
     } catch (err) {
       console.error('❌ Error parsing message:', err);
